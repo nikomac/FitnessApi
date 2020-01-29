@@ -1,4 +1,4 @@
-package com.nikomac.FitApi.Repositories;
+package com.nikomac.FitApi.Dal;
 
 public interface WorkoutRepository extends WorkoutRepositoryBasic, WorkoutRepositoryCustom {
 }

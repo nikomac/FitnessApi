@@ -3,10 +3,10 @@ package com.nikomac.FitApi.Controllers.V1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.nikomac.FitApi.Biz.WorkoutService;
 import com.nikomac.FitApi.Contract.V1.WorkoutApiV1;
 import com.nikomac.FitApi.Exceptions.WorkoutNotFoundException;
 import com.nikomac.FitApi.Models.Workout;
-import com.nikomac.FitApi.Repositories.WorkoutRepository;
 import com.nikomac.FitApi.Translators.V1.WorkoutTranslatorV1;
 
 import org.springframework.http.ResponseEntity;
@@ -19,25 +19,27 @@ import java.util.stream.Collectors;
 public class WorkoutControllerV1 {
 
 	@Autowired
-	WorkoutRepository workoutRepository;
+	WorkoutService workoutService;
 
 	@GetMapping("")
 	public List<WorkoutApiV1> getAll() {
-		return workoutRepository.findAll().stream().map(x-> WorkoutTranslatorV1.Translate(x)).collect(Collectors.toList());
+
+		List<Workout> workouts = workoutService.retrieveWorkouts();
+		return workouts.stream().map(x -> WorkoutTranslatorV1.Translate(x)).collect(Collectors.toList());
+	}
+
+	@GetMapping("/{id}")
+	public WorkoutApiV1 getById(@PathVariable(value = "id") int wId) throws WorkoutNotFoundException {
+
+		Workout result = workoutService.getWorkout(wId);
+		return WorkoutTranslatorV1.Translate(result);
 	}
 
 	@PostMapping("")
 	public WorkoutApiV1 create(@Valid @RequestBody WorkoutApiV1 workout) {
-		
-		Workout result = workoutRepository.save(WorkoutTranslatorV1.Translate(workout));
-		return WorkoutTranslatorV1.Translate(result);
-	}
 
-	@GetMapping("/{id}")
-	public WorkoutApiV1 getById(@PathVariable(value = "id") int wId) 
-			throws WorkoutNotFoundException {
-		
-		Workout result = workoutRepository.findById(wId).orElseThrow(() -> new WorkoutNotFoundException(wId));
+		Workout toSave = WorkoutTranslatorV1.Translate(workout);
+		Workout result = workoutService.createWorkout(toSave);
 		return WorkoutTranslatorV1.Translate(result);
 	}
 
@@ -45,17 +47,16 @@ public class WorkoutControllerV1 {
 	public WorkoutApiV1 update(@PathVariable(value = "id") int wId, @Valid @RequestBody WorkoutApiV1 workoutDetails)
 			throws WorkoutNotFoundException {
 
-		Workout result = workoutRepository.updateWorkout(wId, WorkoutTranslatorV1.Translate(workoutDetails));
-		
+		Workout updateData = WorkoutTranslatorV1.Translate(workoutDetails); 
+		Workout result = workoutService.updateWorkout(wId, updateData);
+
 		return WorkoutTranslatorV1.Translate(result);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> delete(@PathVariable(value = "id") int wId) 
-			throws WorkoutNotFoundException {
+	public ResponseEntity<?> delete(@PathVariable(value = "id") int wId) throws WorkoutNotFoundException {
 
-		Workout workout = workoutRepository.findById(wId).orElseThrow(() -> new WorkoutNotFoundException(wId));
-		workoutRepository.delete(workout);
+		workoutService.deleteWorkout(wId);
 
 		return ResponseEntity.ok().build();
 	}

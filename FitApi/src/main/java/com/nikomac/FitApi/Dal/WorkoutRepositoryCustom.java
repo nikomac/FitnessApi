@@ -1,4 +1,4 @@
-package com.nikomac.FitApi.Repositories;
+package com.nikomac.FitApi.Dal;
 
 import com.nikomac.FitApi.Exceptions.WorkoutNotFoundException;
 import com.nikomac.FitApi.Models.Workout;

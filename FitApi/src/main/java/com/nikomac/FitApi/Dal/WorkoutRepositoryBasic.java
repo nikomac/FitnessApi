@@ -1,4 +1,4 @@
-package com.nikomac.FitApi.Repositories;
+package com.nikomac.FitApi.Dal;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
