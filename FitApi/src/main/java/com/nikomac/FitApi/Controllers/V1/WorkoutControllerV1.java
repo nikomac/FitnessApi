@@ -14,6 +14,10 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/*
+ * Version 1 de los controller 
+ */
+
 @RestController
 @RequestMapping("/api/v1/workouts")
 public class WorkoutControllerV1 {

@@ -4,6 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
+/*
+ * He implementado un filtro para los headers
+ */
+
 public class APIKeyAuthFilter extends AbstractPreAuthenticatedProcessingFilter {
 
     private String principalRequestHeader;

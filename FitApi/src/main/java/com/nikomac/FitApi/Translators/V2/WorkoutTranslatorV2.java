@@ -3,6 +3,10 @@ package com.nikomac.FitApi.Translators.V2;
 import com.nikomac.FitApi.Contract.V2.WorkoutApiV2;
 import com.nikomac.FitApi.Models.Workout;
 
+/*
+ * Version 2 de los traductores 
+ */
+
 public class WorkoutTranslatorV2 {
 
 	public static WorkoutApiV2 Translate(Workout internal) {

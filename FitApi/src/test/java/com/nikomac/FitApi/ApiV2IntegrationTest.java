@@ -17,9 +17,13 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import com.nikomac.FitApi.Contract.V2.WorkoutApiV2;
 
+/*
+ * Test de integracion donde levantamos la API y hacemos un testeo CRUD completo 
+ */
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FitApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class FitApiApplicationTests {
+public class ApiV2IntegrationTest {
 
 	@Autowired
 	private TestRestTemplate restTemplate;
@@ -29,6 +33,13 @@ public class FitApiApplicationTests {
 
 	private String getUrl() {
 		return "http://localhost:" + port + "/api/v2/workouts/";
+	}
+	
+	private HttpHeaders getHeader(){
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("API_KEY", "testkey");
+		return headers;
 	}
 
 	@Test
@@ -45,9 +56,8 @@ public class FitApiApplicationTests {
 		testDelete(createdId);
 	}
 	
-	public void testGetAll() {
-		HttpHeaders headers = new HttpHeaders();
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+	public void testGetAll() {		
+		HttpEntity<String> entity = new HttpEntity<String>(null, getHeader());
 
 		ResponseEntity<String> response = restTemplate.exchange(getUrl(), HttpMethod.GET, entity, String.class);
 
@@ -60,8 +70,10 @@ public class FitApiApplicationTests {
 		workout.name = "Monday Leg Day";
 		workout.trainer = "Guillem";
 		workout.description = "Squat until you die!";
+		
+		HttpEntity<WorkoutApiV2> entity = new HttpEntity<WorkoutApiV2>(workout, getHeader());
+		ResponseEntity<WorkoutApiV2> postResponse = restTemplate.exchange(getUrl(), HttpMethod.POST, entity, WorkoutApiV2.class);
 
-		ResponseEntity<WorkoutApiV2> postResponse = restTemplate.postForEntity(getUrl(), workout, WorkoutApiV2.class);
 		Assert.assertTrue(postResponse.getStatusCode() == HttpStatus.OK);
 		Assert.assertNotNull(postResponse);
 		Assert.assertNotNull(postResponse.getBody());
@@ -71,29 +83,40 @@ public class FitApiApplicationTests {
 	}
 
 	public void testGetById(int id) {
-		WorkoutApiV2 workout = restTemplate.getForObject(getUrl() + id, WorkoutApiV2.class);
-		Assert.assertNotNull(workout);
+		
+		HttpEntity<String> entity = new HttpEntity<String>(null, getHeader());
+
+		ResponseEntity<WorkoutApiV2> response = restTemplate.exchange(getUrl() + id, HttpMethod.GET, entity, WorkoutApiV2.class);
+		Assert.assertEquals(id, response.getBody().id);
 	}
 
 	public void testUpdate(int id) {
-		WorkoutApiV2 workout = restTemplate.getForObject(getUrl() + id, WorkoutApiV2.class);
-		Assert.assertNotNull(workout);
+		
+		HttpEntity<String> entity = new HttpEntity<String>(null, getHeader());
+		ResponseEntity<WorkoutApiV2> response = restTemplate.exchange(getUrl() + id, HttpMethod.GET, entity, WorkoutApiV2.class);
+		
+		WorkoutApiV2 workout = response.getBody();
+		Assert.assertEquals(id, response.getBody().id);
+		
 		workout.trainer = "Manolo";
 
-		restTemplate.put(getUrl() + id, workout);
+		HttpEntity<WorkoutApiV2> updateEntity = new HttpEntity<WorkoutApiV2>(workout, getHeader());
+		ResponseEntity<WorkoutApiV2> updateResponse = restTemplate.exchange(getUrl() + id, HttpMethod.PUT, updateEntity, WorkoutApiV2.class);
 
-		WorkoutApiV2 updatedWorkout = restTemplate.getForObject(getUrl() + id, WorkoutApiV2.class);
+		WorkoutApiV2 updatedWorkout = updateResponse.getBody();
 		Assert.assertNotNull(updatedWorkout);
 		Assert.assertEquals(workout.trainer, updatedWorkout.trainer);
 	}
 
 	public void testDelete(int id) {
-		restTemplate.delete(getUrl() + id);
+		
+		HttpEntity<String> entity = new HttpEntity<String>(null, getHeader());
+		restTemplate.exchange(getUrl() + id, HttpMethod.DELETE, entity, String.class);
 
 		try {
-			restTemplate.getForObject(getUrl() + id, WorkoutApiV2.class);
+			restTemplate.exchange(getUrl() + id, HttpMethod.GET, entity, WorkoutApiV2.class);
 		} catch (final HttpClientErrorException e) {
-			Assert.assertEquals(e.getStatusCode(), HttpStatus.NOT_FOUND);
+			Assert.assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
 		}
 	}
 

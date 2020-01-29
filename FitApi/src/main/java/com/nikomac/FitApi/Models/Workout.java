@@ -3,6 +3,10 @@ package com.nikomac.FitApi.Models;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+/*
+ * Definicion de la entidad de core y base de datos 
+ */
+
 @Entity
 @Table(name = "workouts")
 public class Workout {

@@ -10,6 +10,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
+
+/*
+ * Aqui utilizamos el filtro para poder capturar el header y verificar si lleva el parametro API_KEY y el valor correcto
+ * o si no sera denegado el acceso, esta autenticacion sencilla la he implementado solo en la V2 de los controllers
+ */
+
 @Configuration
 @EnableWebSecurity
 @Order(1)
