@@ -15,29 +15,20 @@ public class SwaggerConfig {
 
 	@Bean
 	public Docket v1() {
-		String ver = "v1";
-		return new Docket(DocumentationType.SWAGGER_2)
-				.groupName("API "+ ver)
-				.select()
-				.apis(RequestHandlerSelectors.basePackage("com.nikomac.FitApi.Controllers"))
-				.paths( x -> { return x.startsWith("/"+ver+"/");})
-				.build()
-				.apiInfo(new ApiInfoBuilder()
-					.version(ver)
-					.title("Fitness API")
-					.description("Documentation Fitness API "+ver)
-					.build()
-				);
+		return GetDocket("v1");
 	}
 	
 	@Bean
 	public Docket v2() {
-		String ver = "v2";
+		return GetDocket("v2");
+	}
+	
+	private Docket GetDocket(String ver) {		
 		return new Docket(DocumentationType.SWAGGER_2)
 				.groupName("API "+ ver)
 				.select()
 				.apis(RequestHandlerSelectors.basePackage("com.nikomac.FitApi.Controllers"))
-				.paths( x -> { return x.startsWith("/"+ver+"/");})
+				.paths( x -> { return x.startsWith("/api/"+ver+"/");})
 				.build()
 				.apiInfo(new ApiInfoBuilder()
 					.version(ver)
